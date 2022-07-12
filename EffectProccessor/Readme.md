@@ -15,6 +15,9 @@ For the effect, we use a framework that has the following model storage format
     ├── variables.data-00001-of-00002
     └── variables.index
 ```
+assets -  directory contains files used by the TensorFlow graph, for example text files used to initialize vocabulary tables. It is unused in this example.
+variables - directory contains a standard training checkpoint
+saved_model.pb - file stores the actual TensorFlow program, or model, and a set of named signatures, each identifying a function that accepts tensor inputs and produces tensor outputs.
 ### Download
 
 1) Download archive from [url](https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2)
