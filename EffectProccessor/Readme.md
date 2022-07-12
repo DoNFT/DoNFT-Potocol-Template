@@ -6,7 +6,7 @@ and storage of models. Because we need to quickly and without errors perform man
 operations and it is impossible for a small team to offer a good solution, 
 so all the work with the model is implemented in the framework. 
 
-For the effect, we use a framework that has the following model storage format
+For style transfer effect, we use a framework that has the following model storage format
 ```bash
 ├── assets
 ├── saved_model.pb
