@@ -1,6 +1,4 @@
-import common.service_attributes.factory_sevice_attributes as factory
-from settings import SERVICE_EFFECT
+from style_transfer.service_attributes import StyleTransferServiceAttributes
 
-factory_attributes = factory.FactoryServiceAttributes()
-service_attributes = factory_attributes.create_service_attributes(SERVICE_EFFECT)
+service_attributes = StyleTransferServiceAttributes()
 service = service_attributes.get_effect_service()

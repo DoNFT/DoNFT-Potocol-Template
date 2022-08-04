@@ -10,23 +10,13 @@ class Environment(Enum):
     PROD = "PROD"
 
 
-class ServiceEffect(Enum):
-    STYLE_TRANSFER = "STYLE_TRANSFER"
-
-
 PROJECT_DIR = Path(__file__).parent.parent.resolve()
-BACKEND_DIR = PROJECT_DIR / "backend"
+BACKEND_DIR = PROJECT_DIR / "EffectProccessor"
 
 env = environs.Env()
 env.read_env(BACKEND_DIR / ".env", recurse=False)
 
 ENVIRONMENT = env.enum("ENVIRONMENT", type=Environment, ignore_case=True)
-SERVICE_EFFECT = env.enum(
-    "SERVICE_EFFECT",
-    type=ServiceEffect,
-    ignore_case=True,
-    default=ServiceEffect.STYLE_TRANSFER.value,
-)
 
 with open(BACKEND_DIR / "version.txt", "r") as f:
     PROJECT_VERSION = f.read().replace('/n', '')
