@@ -34,3 +34,36 @@ saved_model.pb - file stores the actual TensorFlow program, or model, and a set 
 8) Press Execute
 
 Repeat all points 6-8 for all files of our model.
+
+Use this date for filling configs/cfg_style_transfer.json
+
+## Setting up
+### Make sure python 3.8 is installed
+
+### Create .env file in `backend` directory (see `env.example`)
+
+```shell
+cd backend
+pip install poetry==1.1.11
+poetry install
+```
+
+# Running project locally
+```shell
+cd style_transfer
+poetry run python main.py
+```
+
+# Documentation 
+
+http://localhost:8001/docs
+
+## docker 
+
+located in folder style_transfer
+
+```
+docker build --rm -t donft-backend:latest .
+
+docker run --env-file .env --rm  -p 2800:2800 --name donft-backend donft-backend:latest 
+```
