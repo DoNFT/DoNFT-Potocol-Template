@@ -1,8 +1,8 @@
 {
   "name": "hardhat-project",
   "scripts": {
-    "deploy": "npx hardhat run --network rinkeby scripts/deploy.js",
-    "deploy-fresh": "npx hardhat run --network rinkeby scripts/deployFresh.js",
+    "deploy": "npx hardhat run --network harmonyTestnet scripts/deploy.js",
+    "deploy-fresh": "npx hardhat run --network harmonyTestnet scripts/deployFresh.js",
     "update": "npx hardhat run --network rinkeby scripts/update.js"
   },
   "license": "MIT",
@@ -13,10 +13,11 @@
     "chai": "^4.3.4",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.5.2",
-    "hardhat": "^2.6.7"
+    "hardhat": "^2.10.1"
   },
   "dependencies": {
     "@nomiclabs/hardhat-etherscan": "^2.1.7",
+    "@openzeppelin/contracts": "^4.7.2",
     "@openzeppelin/contracts-upgradeable": "^4.3.2",
     "dotenv": "^10.0.0"
   }
