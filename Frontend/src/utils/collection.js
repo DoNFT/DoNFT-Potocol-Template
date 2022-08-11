@@ -2,6 +2,7 @@ export const CollectionType = {
     EFFECT: 'effect',
     BUNDLE: 'bundle',
     NONE: 'none',
+    WHITE_LIST: 'white_list',
 
     canApplyEffect(type){
         return [this.BUNDLE, this.NONE].includes(type)

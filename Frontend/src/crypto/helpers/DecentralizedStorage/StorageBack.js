@@ -45,12 +45,11 @@ export default {
         }
     },
 
-    async readData(url, timeout = 10000){
+    async readData(url){
         let meta = null
         try{
             if(!url.startsWith('ipfs://') && !url.startsWith('http')) url = 'ipfs://'+url
             let fetchURL = null
-            console.warn(url);
             if(url.startsWith('ipfs://')) fetchURL = `https://ipfs.io/ipfs/${url.replace('ipfs://', '')}`
             else if(url.startsWith('http')) fetchURL = url
             if(fetchURL){

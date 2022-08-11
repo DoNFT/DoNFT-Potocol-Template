@@ -1,4 +1,4 @@
-import AppAPI from "@/utils/API";
+import AppAPI, {HTTP} from "@/utils/API";
 import ConnectionStore from "@/crypto/helpers/ConnectionStore";
 
 export const Roles = {
@@ -8,7 +8,7 @@ export const Roles = {
     nonRemoved: [1, 2]
 }
 
-export async function applyAssets(original, modifier){
+export async function applyAssets(serverURL, original, modifier){
     const sendBody = {
         original: {
             contract: original.contractAddress,
@@ -23,8 +23,8 @@ export async function applyAssets(original, modifier){
         sender: ConnectionStore.getUserIdentity()
     }
 
-    const {headers, data: blobImage} = await AppAPI.post(
-        '/effects/applyEffect',
+    const {headers, data: blobImage} = await HTTP.post(
+        serverURL,
         sendBody,
         {
             responseType: 'blob'

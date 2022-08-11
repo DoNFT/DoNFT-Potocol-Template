@@ -47,30 +47,65 @@ class EVM {
             testContract
         } = Networks.getSettings(ConnectionStore.getNetwork().name)
 
-        const collections = await Promise.all([
-            this.getContractWithTokens(bundleContract, CollectionType.BUNDLE),
-            this.getContractWithTokens(effectsContract, CollectionType.EFFECT),
-            this.getContractWithTokens(testContract, CollectionType.NONE),
-        ])
+        const contractsList = [bundleContract, effectsContract, testContract]
+
+        const collections = await Promise.all(contractsList.map(contractAddress => this.getContractWithTokens(contractAddress)))
 
         storage.changeCollectionLoadingState(false)
         storage.setCollections(collections)
     }
 
-    async getContractWithTokens(address, type = CollectionType.NONE){
+    async getContractWithTokens(address){
         const userIdentity = ConnectionStore.getUserIdentity()
         const contract = new SmartContract({
-            address,
-            type
+            address
         })
+
+        const checkContractTypes = {
+            isBundle: null,
+            isEffect: null
+        }
+        const contractInstance = await contract._getInstance()
+
+        checkContractTypes.isBundle = await contractInstance.supportsInterface(process.env.VUE_APP_BUNDLE_INTERFACE_ID)
+
+        //  check for effect
+        if(!checkContractTypes.isBundle){
+            const whiteList = await this.getWhiteList()
+            checkContractTypes.isEffect = whiteList.find(contract => stringCompare(contract.contractAddress, address))
+        }
+
         const plainContractObject = await contract.getObjectForUser(userIdentity)
-        plainContractObject.type = type
+
+        if(checkContractTypes.isBundle) plainContractObject.type = CollectionType.BUNDLE
+        else if(checkContractTypes.isEffect) plainContractObject.type = CollectionType.EFFECT
+        else plainContractObject.type = CollectionType.NONE
+
         return Formatters.contractFormat(plainContractObject)
     }
 
-    // not use
+    whiteList = []
+    async getWhiteList({withUpdate = false} = {}){
+        if(!withUpdate && this.whiteList.length) return this.whiteList
+
+        const {
+            whiteListContract: address,
+        } = Networks.getSettings(ConnectionStore.getNetwork().name)
+
+        const contract = new SmartContract({
+            address,
+            type: CollectionType.WHITE_LIST
+        })
+
+        return this.whiteList = await contract.getWhiteList()
+    }
+
+    async getApplyEffectServerURLByContractAddress(contractAddress) {
+        const whiteList = await this.getWhiteList()
+        return whiteList.find(item => stringCompare(item.contractAddress, contractAddress))?.serverUrl
+    }
+
     async getContractTokens(contractAddress){
-        console.log('getContractTokens', contractAddress)
         const contract = new SmartContract({
             address: contractAddress
         })
@@ -99,17 +134,22 @@ class EVM {
         return tokens
     }
 
-
-
-
-
-
-    async mintTestToken({cid, contractAddress}){
-        const contract = new SmartContract({
-            address: contractAddress
-        })
-        return await contract.mint(ConnectionStore.getUserIdentity(), cid)
+    async getTokenListByIdentity(identityList){
+        return await Promise.all(identityList.map(identity => this.getTokenByIdentity(identity)))
     }
+
+    async getTokenByIdentity(identity){
+        const [address, tokenID] = identity.split(':')
+        const contract = new SmartContract({
+            address
+        })
+        return await contract.getTokenById(tokenID)
+    }
+
+
+
+
+
 
     async updateContractTokensList(list) {
         try{
@@ -133,6 +173,16 @@ class EVM {
         finally {
             storage.changeContractUpdating(contractAddress, false)
         }
+    }
+
+
+
+
+    async mintTestToken({cid, contractAddress}){
+        const contract = new SmartContract({
+            address: contractAddress
+        })
+        return await contract.mint(ConnectionStore.getUserIdentity(), cid)
     }
 
     async createBundle(meta, image, tokens){
@@ -175,7 +225,10 @@ class EVM {
         const storage = AppStorage.getStore()
 
         storage.setProcessStatus(ActionTypes.generating_media)
-        let {url: image, blob} = await Token.applyAssets(original, effect)
+
+        const serverURL = await this.getApplyEffectServerURLByContractAddress(effect.contractAddress)
+
+        let {url: image, blob} = await Token.applyAssets(serverURL, original, effect)
 
         storage.setProcessStatus(ActionTypes.uploading_meta_data)
         const metaCID = await DecentralizedStorage.loadJSON({
@@ -204,6 +257,10 @@ class EVM {
         }
     }
 
+
+
+
+
     async addTokensToBundle(tokenList){
         const addingTokenIdentities = tokenList.map(t => t.identity)
         const computedTokenList = Token.transformIdentitiesToObjects(addingTokenIdentities)
@@ -231,17 +288,24 @@ class EVM {
         }
     }
 
-    async getTokenListByIdentity(identityList){
-        return await Promise.all(identityList.map(identity => this.getTokenByIdentity(identity)))
+
+
+
+
+    async sendNFT(tokenObject, toAddressPlain) {
+        const {realAddress: toAddress} = await this.checkForENSName(toAddressPlain)
+        const [contractAddress, tokenID] = tokenObject.identity.split(':')
+        const fromAddress = ConnectionStore.getUserIdentity()
+        if(stringCompare(fromAddress, toAddress)) throw Error('THE_SAME_ADDRESS_ERROR')
+
+        return {
+            contractAddress,
+            tokenID,
+            fromAddress,
+            toAddress
+        }
     }
 
-    async getTokenByIdentity(identity){
-        const [address, tokenID] = identity.split(':')
-        const contract = new SmartContract({
-            address
-        })
-        return await contract.getTokenById(tokenID)
-    }
 
     async checkForENSName(address){
         if(ethers.utils.isAddress(address)){
@@ -276,27 +340,6 @@ class EVM {
         alert.open('Sorry, we did not support this network')
     }
 
-
-
-
-
-
-
-
-    async sendNFT(tokenObject, toAddressPlain) {
-        const {realAddress: toAddress} = await this.checkForENSName(toAddressPlain)
-        const [contractAddress, tokenID] = tokenObject.identity.split(':')
-        const fromAddress = ConnectionStore.getUserIdentity()
-        if(stringCompare(fromAddress, toAddress)) throw Error('THE_SAME_ADDRESS_ERROR')
-
-        return {
-            contractAddress,
-            tokenID,
-            fromAddress,
-            toAddress
-        }
-    }
-
     async approve(tokenObject, toAddressPlain) {
         const {realAddress: forAddress} = await this.checkForENSName(toAddressPlain)
         const [contractAddress, tokenID] = tokenObject.identity.split(':')
@@ -319,31 +362,6 @@ class EVM {
         const approvedFor = await Contract.getApproved(tokenID)
         return approvedFor && stringCompare(approvedFor, ConnectionStore.getUserIdentity())
     }
-
-
-
-
-
-
-
-    /*
-    * Apply effect to token
-    * @param {object} token - common token object like {id (Number), address (0x...), identity, name, image, ?attributes, ?external_url}
-    * @param {object} effect - common token object
-    * @param {object} meta - {name, description, link}
-    * @return {object} like {transactionResult, provider}
-    * */
-
-    /*
-    * Make tokens bundle
-    * @param {array} tokens - array of common token objects like {id (Number), address (0x...), identity, name, image, ?attributes, ?external_url}
-    * @param {object} meta - {name, description, link}
-    * @param {object} ?image - instance of Blob (File)
-    * @return {object} like {transactionResult, provider}
-    * */
-    async makeTokensBundle({tokens, meta, image = null}){}
-
-    async unwrap(tokenID) {}
 }
 
 export default EVM

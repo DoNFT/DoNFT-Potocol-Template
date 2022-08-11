@@ -279,6 +279,17 @@ class SmartContract {
         return await Contract.getApproved(tokenID)
     }
 
+    async getWhiteList(){
+        const Contract = await this._getInstance()
+        const list = await Contract.getEffectInfos() || []
+        return list.map(item => ({
+            contractAddress: item.modificatorsContract,
+            serverUrl: item.serverUrl,
+            owner: item.owner,
+            onlyFor: Number(item.originalContract) && item.originalContract || null
+        }))
+    }
+
     async _getInstance(){
         if(!this._instance){
 

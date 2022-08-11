@@ -10,14 +10,10 @@ export function contractFormat({
    type = CollectionType.NONE
 }){
 
-    const {
-        bundleContract,
-        effectsContract
-    } = Networks.getSettings(ConnectionStore.getNetwork().name)
-
     let contractName = name || address
-    if(stringCompare(address, bundleContract)) contractName = `[Bundle] ${contractName}`
-    else if(stringCompare(address, effectsContract)) contractName = `[Effect] ${contractName}`
+
+    if(type === CollectionType.BUNDLE) contractName = `[Bundle] ${contractName}`
+    else if(type === CollectionType.EFFECT) contractName = `[Effect] ${contractName}`
 
     return {
         address,

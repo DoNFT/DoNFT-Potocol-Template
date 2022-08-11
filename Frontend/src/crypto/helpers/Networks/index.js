@@ -45,19 +45,22 @@ const settings = {
         // new from MVP (with add/remove)
         bundleContract: '0x153FF94EEC8ed695b985f7658a48B67D79c78Ca6',
         effectsContract: '0x3c4269CC3c86a558cA5162D8E682543e040F71de',
+        whiteListContract: '0x8eb4064C391CBa932a1ebb6431260326C6485E36',
 
         testContract: '0x9b7f8bdb86696300b734944cefa35b42c5eb3aa1',
         store: 'https://rinkeby.rarible.com'
     },
     maticmum: {
         store: 'https://testnets.opensea.io',
-        bundleContract: '0x6c88295de564A85a40d8e6D994C6f6DA4Db26302',
-        effectsContract: '0xde7173a35bf2479d5e8e455be4a33d206c95204e',
+        bundleContract: '0x4f660dC8Ec8B9092A2B892655325Fdf69042EEaC',
+        effectsContract: '0x10223Fb767F93e7102308D753dCa71F0A432b290',
+        whiteListContract: '0x00',
         testContract: '0x9b7f8bdb86696300b734944cefa35b42c5eb3aa1',
     },
     harmony_testnet: {
         bundleContract: '0xE13D87772b6D728D84c32D971A62D930A804e70F',
         effectsContract: '0x5533E63796a5ddFC28d996daF9E69A6B7Ed9878B',
+        whiteListContract: '0x00',
         testContract: '0x369259905eE928ab1502DB060aBc5076480A86f5',
         store: '',
     }

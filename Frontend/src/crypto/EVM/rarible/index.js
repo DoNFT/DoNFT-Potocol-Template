@@ -126,33 +126,6 @@ class Rarible extends Evm{
         })
         return await Contract.sendToken(tokenID, fromAddress, toAddress)
     }
-
-
-
-    async getUserTokens({updateCache = false} = {}){}
-
-    async getUserEffects({updateCache = false} = {}) {}
-
-    /*  ----------  Actions ON  ----------  */
-
-    /*
-    * Apply effect to token
-    * @param {object} token - common token object like {id (Number), address (0x...), identity, name, image, ?attributes, ?external_url}
-    * @param {object} effect - common token object
-    * @param {object} meta - {name, description, link}
-    * @return {object} like {transactionResult, provider}
-    * */
-
-    /*
-    * Make tokens bundle
-    * @param {array} tokens - array of common token objects like {id (Number), address (0x...), identity, name, image, ?attributes, ?external_url}
-    * @param {object} meta - {name, description, link}
-    * @param {object} ?image - instance of Blob (File)
-    * @return {object} like {transactionResult, provider}
-    * */
-    async makeTokensBundle({tokens, meta, image = null}){}
-
-    async unwrap(tokenID) {}
 }
 
 export default Rarible
