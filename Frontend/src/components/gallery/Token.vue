@@ -1,7 +1,7 @@
 <template>
   <div
     class="token"
-    :class="{selected: isSelected}"
+    :class="{selected: isSelected, token_na:!isAvailable}"
     @click="choose"
   >
     <div class="token__img" :style="computeTokenImgStyle(token.image)"></div>
@@ -25,11 +25,15 @@
         isSelected: {
             type: Boolean,
             default: false
+        },
+        isAvailable: {
+            type: Boolean,
+            default: true
         }
     })
     const emits = defineEmits(['choose'])
     const choose = () => {
-        if(!props.token.isForBuy) emits('choose')
+        if(!props.token.isForBuy && props.isAvailable) emits('choose')
     }
     const isLoading = ref(false)
     const mint = async () => {

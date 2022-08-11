@@ -1,7 +1,7 @@
 import Evm from "@/crypto/EVM";
 import RaribleConnector from "@/crypto/EVM/rarible/Connector";
 import SmartContract from "@/crypto/EVM/SmartContract";
-import {AppStorage, ConnectionStore, Networks, Token} from "@/crypto/helpers";
+import {AppStorage, ConnectionStore} from "@/crypto/helpers";
 
 import {ActionTypes} from "@/crypto/helpers"
 
@@ -26,7 +26,6 @@ class Rarible extends Evm{
         })
 
         const storage = AppStorage.getStore()
-        await contract.approveTokenList(tokensList, storage.setProcessStatus)
 
         storage.setProcessStatus(ActionTypes.minting_bundle)
         const result = await contract.makeBundle(tokensList, metaCID, storage.setProcessStatus)
@@ -52,7 +51,6 @@ class Rarible extends Evm{
         })
 
         const storage = AppStorage.getStore()
-        await contract.approveTokenList(tokensList, storage.setProcessStatus)
         storage.setProcessStatus(ActionTypes.minting_bundle)
 
         const result = await contract.makeBundle(tokensList, resultTokenCID, storage.setProcessStatus)
@@ -62,6 +60,36 @@ class Rarible extends Evm{
             issuedContractAddress: contractAddress,
             tempImage
         }
+    }
+
+    async addTokensToBundle(originToken, needToAddTokenList){
+        const {
+            addingTokenList
+        } = await super.addTokensToBundle(needToAddTokenList)
+
+        const contract = new SmartContract({
+            address: originToken.contractAddress,
+            type: 'bundle'
+        })
+
+        const store = AppStorage.getStore()
+        await contract.approveTokenList(addingTokenList, store.setProcessStatus)
+
+        store.setProcessStatus(ActionTypes.adding_to_bundle)
+        return await contract.addToBundle(originToken.id, addingTokenList)
+    }
+
+    async removeAssetsFromBundle(originToken, removeToken){
+        const {
+            removingTokens
+        } = await super.removeAssetsFromBundle([removeToken])
+
+        const contract = new SmartContract({
+            address: originToken.contractAddress,
+            type: 'bundle'
+        })
+
+        return await contract.removeFromBundle(originToken.id, removingTokens)
     }
 
     async unbundleToken(token){
@@ -104,7 +132,6 @@ class Rarible extends Evm{
     async getUserTokens({updateCache = false} = {}){}
 
     async getUserEffects({updateCache = false} = {}) {}
-
 
     /*  ----------  Actions ON  ----------  */
 

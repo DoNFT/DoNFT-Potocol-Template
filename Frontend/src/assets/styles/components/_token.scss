@@ -12,6 +12,15 @@
     background: var(--token-bg_hover);
   }
 
+  &_na{
+    cursor: not-allowed;
+    opacity: .5;
+
+    &:hover{
+      background: var(--token-bg);
+    }
+  }
+
   &__img{
     width: 120px;
     height: 120px;

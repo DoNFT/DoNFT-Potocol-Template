@@ -8,8 +8,9 @@ import {
     ConnectionStore,
     ErrorList,
     TokensABI,
-    ActionTypes
+    ActionTypes, Networks
 } from '@/crypto/helpers'
+import {getData} from "@/crypto/helpers/Networks";
 
 
 class SmartContract {
@@ -131,7 +132,8 @@ class SmartContract {
         const tokensInside = await Contract.bundeledTokensOf(tokenID)
         return tokensInside.map(token => ({
             contractAddress: token.token,
-            tokenID: token.tokenId.toString()
+            tokenID: token.tokenId.toString(),
+            role: token.role
         }))
     }
 
@@ -200,8 +202,9 @@ class SmartContract {
 
     async mint(userIdentity, metaCID){
         const Contract = await this._getInstance()
+        const {gasLimit} = Networks.getData(ConnectionStore.getNetwork().name)
         try{
-            const transactionResult = await Contract['mintItem(address,string)'](userIdentity, metaCID)
+            const transactionResult = await Contract.mintItem(userIdentity, metaCID, {gasLimit})
             log(transactionResult)
             return await transactionResult.wait()
         }
@@ -212,6 +215,20 @@ class SmartContract {
         }
     }
 
+    async addToBundle(addToTokenID, tokenList){
+        const tokenURI = await this.getTokenURI(addToTokenID)
+        return await this.callMethod('addNFTsToBundle', addToTokenID, tokenList, tokenURI)
+    }
+
+    async removeFromBundle(fromTokenID, tokenList){
+        const tokenURI = await this.getTokenURI(fromTokenID)
+        return await this.callMethod('removeNFTsFromBundle', fromTokenID, tokenList, tokenURI)
+    }
+
+    async getTokenURI(tokenID){
+        const Contract = await this._getInstance()
+        return await Contract.tokenURI(tokenID)
+    }
 
     async callWithoutSign(method, ...args){
         const Contract = await this._getInstance()

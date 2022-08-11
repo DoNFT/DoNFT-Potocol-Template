@@ -87,6 +87,13 @@ class EVM {
         const wrappedTokens = await contract.getWrappedTokenList(tokenID)
         const wrappedTokenIdentities = wrappedTokens.map(token => `${token.contractAddress}:${token.tokenID}`)
         const tokens = await this.getTokenListByIdentity(wrappedTokenIdentities)
+
+        // add roles
+        tokens.forEach(token => {
+            const originToken = wrappedTokens.find(t => t.contractAddress === token.contractAddress && t.tokenID === token.id)
+            token.role = originToken? originToken.role : Token.Roles.NoRole
+        })
+
         storage.setTokenInside(contractAddress, tokenID, tokens)
         storage.changeLoadingInnerTokens(contractAddress, tokenID, false)
         return tokens
@@ -137,6 +144,7 @@ class EVM {
         } = await this.createTokenMeta(meta, image)
 
         const tokensList = Token.transformIdentitiesToObjects(tokens.map(t => t.identity))
+        Token.addRole(tokensList)
 
         const {
             bundleContract: address
@@ -178,6 +186,10 @@ class EVM {
         })
 
         const computedTokenList = Token.transformIdentitiesToObjects([original.identity, effect.identity])
+        Token.addRole(computedTokenList, {
+            original: [original.identity],
+            modifier: [effect.identity]
+        })
 
         const {
             bundleContract: contractAddress
@@ -189,6 +201,33 @@ class EVM {
             tokensList: computedTokenList,
             tempImage: blob,
             permanentImage: image
+        }
+    }
+
+    async addTokensToBundle(tokenList){
+        const addingTokenIdentities = tokenList.map(t => t.identity)
+        const computedTokenList = Token.transformIdentitiesToObjects(addingTokenIdentities)
+        computedTokenList.forEach(token => {
+            token.role = Token.Roles.NoRole
+        })
+
+        return {
+            addingTokenList: computedTokenList
+        }
+    }
+
+    isRemoveFromBundleAllow(token){
+        return !Token.Roles.nonRemoved.includes(token.role)
+    }
+
+    async removeAssetsFromBundle(tokenList){
+        const addingTokenIdentities = tokenList.map(t => t.identity)
+        const computedTokenList = Token.transformIdentitiesToObjects(addingTokenIdentities)
+        computedTokenList.forEach(token => {
+            token.role = Token.Roles.NoRole
+        })
+        return {
+            removingTokens: computedTokenList
         }
     }
 

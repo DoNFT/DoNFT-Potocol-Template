@@ -39,6 +39,14 @@
           <div v-for="token in preview.token.inner">
             <div :style="computeTokenImgStyle(token.image)"></div>
             <div v-text="token.name"></div>
+            <span
+              class="rm"
+              title="Remove from bundle"
+              v-if="CollectionType.isBundle(preview.contract.type)"
+              @click="removeFromBundle(token)"
+            >
+              <svg viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 18L17.5 3M2.5 3L17.5 18" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </span>
           </div>
         </div>
         <LoaderElement v-if="isPreviewLoading || (CollectionType.isBundle(preview.contract.type) && preview.token.innerLoading)" class="absolute with-bg"/>
@@ -55,6 +63,13 @@
              @click="CollectionType.canApplyEffect(preview.contract.type)? changeSection('apply') : null"
         >
           Apply effect
+        </div>
+        <div class="btn"
+             v-if="CollectionType.isBundle(preview.contract.type)"
+             :class="{active: section === 'add'}"
+             @click="changeSection('add')"
+        >
+          Add assets
         </div>
         <div class="btn"
              :class="{active: section === 'send'}"
@@ -80,7 +95,8 @@
         </a>
       </div>
       <div class="preview__section">
-        <AddAssetSection v-if="section === 'apply'" @close="close"/>
+        <ApplyAssets v-if="section === 'apply'" @close="close"/>
+        <AddAssetSection v-else-if="section === 'add'" @close="close"/>
         <SendSection v-else-if="section === 'send'" :token="preview.token" @close="close"/>
         <InfoSection v-else :token="preview.token"/>
       </div>
@@ -92,6 +108,7 @@
   import {useStore} from "@/store/main";
   import {storeToRefs} from "pinia";
   import {computeTokenImgStyle} from "@/utils/styles";
+  import ApplyAssets from '@/components/preview/ApplyAssets'
   import AddAssetSection from '@/components/preview/AddAssets'
   import InfoSection from '@/components/preview/Info'
   import SendSection from '@/components/preview/Send'
@@ -102,7 +119,7 @@
   import {CollectionType} from "@/utils/collection";
   import confirm from "@/utils/confirm";
 
-  import {Networks, ConnectionStore, getErrorTextByCode} from "@/crypto/helpers"
+  import {Networks, ConnectionStore, getErrorTextByCode, ErrorList} from "@/crypto/helpers"
   import AppConnector from "@/crypto/AppConnector";
   import TrnView from "@/utils/TrnView";
   import alert from "@/utils/alert";
@@ -118,7 +135,7 @@
       return `${collectionName}: ${preview.value.token.name}`
   })
 
-  const section = ref('info')   // info, send, add
+  const section = ref('info')   // info, send, apply, add
   const changeSection = (value) => {
       section.value = value
   }
@@ -138,6 +155,41 @@
                       .onClose(async () => {
                           close()
                           await AppConnector.connector.fetchCollectionsWithTokens()
+                      })
+              }
+              catch (e) {
+                  alert.open(getErrorTextByCode(e.message) || e.message, 'Error:')
+              }
+              finally {
+                  isPreviewLoading.value = false
+              }
+          }
+      )
+  }
+
+  const removeFromBundle = (token) => {
+      const canRemove = AppConnector.connector.isRemoveFromBundleAllow(token)
+      if(!canRemove){
+          alert.open(getErrorTextByCode(ErrorList.HAVE_SPECIAL_ROLE), 'Error:')
+          return
+      }
+
+      confirm.open(
+          `Remove ${token.name} from bundle?`,
+          async () => {
+              try{
+                  isPreviewLoading.value = true
+                  const contractsNeedToUpdate = [preview.value.token.contractAddress, token.contractAddress]
+
+                  const {
+                      transactionHash: hash,
+                  } = await AppConnector.connector.removeAssetsFromBundle(preview.value.token, token)
+
+                  TrnView
+                      .open({hash})
+                      .onClose(async () => {
+                          await AppConnector.connector.updateContractTokensList(contractsNeedToUpdate)
+                          await AppConnector.connector.getWrappedTokensObjectList(preview.value.token.contractAddress, preview.value.token.id)
                       })
               }
               catch (e) {

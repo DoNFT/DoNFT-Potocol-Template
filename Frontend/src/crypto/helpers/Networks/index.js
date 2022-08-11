@@ -38,8 +38,14 @@ const settings = {
         // effectsContract: '0x3c4269CC3c86a558cA5162D8E682543e040F71de',
         // testContract: '0xdDBcD1FFC7EaaE3f8d589d028716a72531954F9f',
 
-        bundleContract: '0xdb538623154643E44CA32B99E91AAd96f53dc8c5',
-        effectsContract: '0xde7173a35bf2479d5e8e455be4a33d206c95204e',
+        // plain bundle without add/remove from it
+        // bundleContract: '0xdb538623154643E44CA32B99E91AAd96f53dc8c5',
+        // effectsContract: '0xde7173a35bf2479d5e8e455be4a33d206c95204e',
+
+        // new from MVP (with add/remove)
+        bundleContract: '0x153FF94EEC8ed695b985f7658a48B67D79c78Ca6',
+        effectsContract: '0x3c4269CC3c86a558cA5162D8E682543e040F71de',
+
         testContract: '0x9b7f8bdb86696300b734944cefa35b42c5eb3aa1',
         store: 'https://rinkeby.rarible.com'
     },

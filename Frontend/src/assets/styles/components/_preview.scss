@@ -128,6 +128,10 @@
   &__modifiers{
     overflow: auto;
 
+    .contract + .contract{
+      margin-top: 0
+    }
+
     .contract__name{
       //padding: 0 0 10px 0;
       font-size: 16px;
@@ -137,6 +141,7 @@
       padding: 0;
       gap: 10px;
       grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      min-height: auto;
     }
 
     .token{
@@ -204,6 +209,23 @@
       padding-top: 5px;
       font-size: 12px;
       text-align: center;
+    }
+
+    .rm{
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      width: 15px;
+      cursor: pointer;
+
+      svg {
+        display: block;
+        width: 100%;
+
+        path{
+          stroke: var(--icon-color);
+        }
+      }
     }
   }
 }

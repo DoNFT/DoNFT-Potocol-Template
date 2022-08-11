@@ -8,6 +8,7 @@
           v-for="token in tokensView"
           :token="token"
           :isSelected="selectedTokens.includes(token.identity)"
+          :isAvailable="!notAvailable.includes(token.identity)"
           @choose="chooseToken(token, contract)"
         />
       </template>
@@ -45,6 +46,11 @@
         byAvailable: {
             type: Boolean,
             default: false
+        },
+        notAvailable: {
+            type: Array,
+            required: false,
+            default: []
         }
     })
     const emits = defineEmits(['chooseToken'])

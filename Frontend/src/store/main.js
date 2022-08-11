@@ -194,6 +194,9 @@ export const useStore = defineStore('main', {
             if(contract){
                 const token = contract.tokens.find(t => t.id === tokenID)
                 if(token) token.inner = insideTokenList
+                if(this.preview.token && this.preview.token.identity === `${contractAddress}:${tokenID}`){
+                    this.preview.token.inner = insideTokenList
+                }
             }
         },
         changeLoadingInnerTokens(contractAddress, tokenID, newState){

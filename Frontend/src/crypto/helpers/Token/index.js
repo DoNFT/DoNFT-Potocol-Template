@@ -1,5 +1,12 @@
-import AppAPI, {HTTP} from "@/utils/API";
+import AppAPI from "@/utils/API";
 import ConnectionStore from "@/crypto/helpers/ConnectionStore";
+
+export const Roles = {
+    NoRole: 0,
+    Original: 1,
+    Modifier: 2,
+    nonRemoved: [1, 2]
+}
 
 export async function applyAssets(original, modifier){
     const sendBody = {
@@ -40,14 +47,17 @@ export function transformIdentitiesToObjects(identitiesList){
     return identitiesList.map(transformIdentityToObject)
 }
 
-export function getCIDFromURL(url){
-    return (url.split('/ipfs/').length > 1)? url.split('/ipfs/')[1] : url
-}
-
 export function computeModifyObject(token){
     return {
         contractAddress: token.contractAddress,
         tokenID: token.id,
         contentUrl: token.image,
     }
+}
+
+export function addRole(tokenList, {original = [], modifier = []} = {}){
+    tokenList.forEach(token => {
+        const tokenIdentity = `${token.token}:${token.tokenId}`
+        token.role = original.includes(tokenIdentity) && Roles.Original || modifier.includes(tokenIdentity) && Roles.Modifier || Roles.NoRole
+    })
 }

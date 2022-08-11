@@ -120,7 +120,6 @@
 
             contractsNeedToUpdate.push(issuedContractAddress)
             contractsNeedToUpdate = [...new Set(contractsNeedToUpdate)]
-            console.log(contractsNeedToUpdate);
 
             TrnView
                 .open({hash})
