@@ -1,4 +1,4 @@
-# DoNFT-EthCC Hackathon Project
+# DoNFT prtotcol template for EVM
 
 Try it https://evm.donft.io
 
