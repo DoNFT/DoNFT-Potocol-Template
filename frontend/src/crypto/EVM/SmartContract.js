@@ -10,7 +10,6 @@ import {
     TokensABI,
     ActionTypes, Networks
 } from '@/crypto/helpers'
-import {getData} from "@/crypto/helpers/Networks";
 
 
 class SmartContract {

@@ -48,7 +48,6 @@ class EVM {
         } = Networks.getSettings(ConnectionStore.getNetwork().name)
 
         const contractsList = [bundleContract, effectsContract, testContract]
-
         const collections = await Promise.all(contractsList.map(contractAddress => this.getContractWithTokens(contractAddress)))
 
         storage.changeCollectionLoadingState(false)

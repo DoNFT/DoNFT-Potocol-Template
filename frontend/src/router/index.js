@@ -81,7 +81,7 @@ router.beforeEach(async (to, from) => {
         return loginPage
       }
     }
-    else return true
+    return true
   }
   catch (e) {
     return loginPage
