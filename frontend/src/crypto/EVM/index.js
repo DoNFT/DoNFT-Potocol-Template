@@ -25,8 +25,8 @@ class EVM {
     async init(){
         return await this.connector.init(this)
     }
-    async connectToWallet(value){
-        return await this.connector.connectToWallet(value)
+    async connectToWallet(...data){
+        return await this.connector.connectToWallet(...data)
     }
     async disconnect(){
         return await this.connector.disconnect()
@@ -41,46 +41,90 @@ class EVM {
         const storage = AppStorage.getStore()
         storage.changeCollectionLoadingState(true)
 
-        const {
-            bundleContract,
-            effectsContract,
-            testContract
-        } = Networks.getSettings(ConnectionStore.getNetwork().name)
+        const collections = []
+        const whiteList = await this.getWhiteList({withUpdate: true})
 
-        const contractsList = [bundleContract, effectsContract, testContract]
-        const collections = await Promise.all(contractsList.map(contractAddress => this.getContractWithTokens(contractAddress)))
+        const bundles = await this._filterWhiteList(whiteList, CollectionType.BUNDLE)
+        collections.push(...bundles)
+
+        if(bundles[0] && bundles[0].address) {
+            const tokens = await this._filterWhiteList(whiteList, CollectionType.TOKENS, bundles[0].address)
+            collections.push(...tokens)
+            const effects = await this._filterWhiteList(whiteList, CollectionType.EFFECT, bundles[0].address)
+            collections.push(...effects)
+        }
 
         storage.changeCollectionLoadingState(false)
         storage.setCollections(collections)
     }
 
-    async getContractWithTokens(address){
+    async getAvailableContractsForCustomMint() {
+        const availableContracts = []
+        const whiteList = await this.getWhiteList()
+        const bundles = await this.getFromWhiteList(whiteList, CollectionType.BUNDLE)
+        if(bundles[0] && bundles[0].contractAddress) {
+            const tokens = await this.getFromWhiteList(whiteList, CollectionType.TOKENS, bundles[0].contractAddress)
+            availableContracts.push(...tokens.map(contract => ({
+                address: contract.contractAddress,
+                name: 'Base tokens'
+            })))
+            const effects = await this.getFromWhiteList(whiteList, CollectionType.EFFECT, bundles[0].contractAddress)
+            availableContracts.push(...effects.map(contract => ({
+                address: contract.contractAddress,
+                name: 'Style'
+            })))
+        }
+        return availableContracts
+    }
+
+    async getFromWhiteList(list, contractType, originatedFor = null){
+        return list.filter(contract => contract.type === contractType && ((originatedFor && stringCompare(contract.onlyFor, originatedFor)) || !originatedFor));
+    }
+
+    async _filterWhiteList(list, contractType, originatedFor = null){
+        const filteredList = list.filter(contract => contract.type === contractType && ((originatedFor && stringCompare(contract.onlyFor, originatedFor)) || !originatedFor));
+        const contracts = []
+        for await (const contractPlain of filteredList){
+            const contract = await this.getContractObject(contractPlain.contractAddress)
+            contract.type = contractType
+            contracts.push(contract)
+        }
+        return contracts
+    }
+
+    async getContractObject(address){
         const userIdentity = ConnectionStore.getUserIdentity()
         const contract = new SmartContract({
             address
         })
+        const plainContract = await contract.getObjectForUser(userIdentity)
+        let contractObject = Formatters.contractFormat(plainContract)
+        contractObject.tokens = await this.addStructuresToTokenList(contractObject.tokens)
+        return contractObject
+    }
 
-        const checkContractTypes = {
-            isBundle: null,
-            isEffect: null
+    async addStructuresToTokenList(tokenList){
+        for await (const token of tokenList){
+            token.structure = await this.getTokenStructure(token)
         }
-        const contractInstance = await contract._getInstance()
+        return tokenList
+    }
 
-        checkContractTypes.isBundle = await contractInstance.supportsInterface(process.env.VUE_APP_BUNDLE_INTERFACE_ID)
+    async getTokenStructure(tokenObject) {
+        if(Array.isArray(tokenObject.structure) && tokenObject.structure.length) return tokenObject.structure
+        let returnTokens = []
 
-        //  check for effect
-        if(!checkContractTypes.isBundle){
-            const whiteList = await this.getWhiteList()
-            checkContractTypes.isEffect = whiteList.find(contract => stringCompare(contract.contractAddress, address))
+        try{
+            returnTokens = await this.getWrappedTokensObjectList(tokenObject.contractAddress, tokenObject.id)
+            for await (const token of returnTokens){
+                token.structure = await this.getTokenStructure(token)
+            }
+        }
+        catch (e){
+            console.log('getTokenStructure error', e);
         }
 
-        const plainContractObject = await contract.getObjectForUser(userIdentity)
-
-        if(checkContractTypes.isBundle) plainContractObject.type = CollectionType.BUNDLE
-        else if(checkContractTypes.isEffect) plainContractObject.type = CollectionType.EFFECT
-        else plainContractObject.type = CollectionType.NONE
-
-        return Formatters.contractFormat(plainContractObject)
+        return returnTokens
     }
 
     whiteList = []
@@ -112,25 +156,22 @@ class EVM {
     }
 
     async getWrappedTokensObjectList(contractAddress, tokenID){
-        const storage = AppStorage.getStore()
-        storage.changeLoadingInnerTokens(contractAddress, tokenID, true)
         const contract = new SmartContract({
-            address: contractAddress,
-            type: CollectionType.BUNDLE
+            address: contractAddress
         })
+        const contractType = await contract.setCorrectContractType()
+        if(contractType !== 'bundle') return []
+
         const wrappedTokens = await contract.getWrappedTokenList(tokenID)
         const wrappedTokenIdentities = wrappedTokens.map(token => `${token.contractAddress}:${token.tokenID}`)
-        const tokens = await this.getTokenListByIdentity(wrappedTokenIdentities)
+        const tokenObjectList = await this.getTokenListByIdentity(wrappedTokenIdentities, false)
 
-        // add roles
-        tokens.forEach(token => {
-            const originToken = wrappedTokens.find(t => t.contractAddress === token.contractAddress && t.tokenID === token.id)
-            token.role = originToken? originToken.role : Token.Roles.NoRole
+        tokenObjectList.forEach(token => {
+            const findInPlain = wrappedTokens.find(t => stringCompare(token.identity, `${t.contractAddress}:${t.tokenID}`))
+            token.tokenRole = findInPlain.role
         })
 
-        storage.setTokenInside(contractAddress, tokenID, tokens)
-        storage.changeLoadingInnerTokens(contractAddress, tokenID, false)
-        return tokens
+        return tokenObjectList
     }
 
     async getTokenListByIdentity(identityList){
@@ -163,7 +204,8 @@ class EVM {
         const storage = AppStorage.getStore()
         try{
             storage.changeContractUpdating(contractAddress, true)
-            const tokens = await this.getContractTokens(contractAddress, true)
+            let tokens = await this.getContractTokens(contractAddress, true)
+            tokens = await this.addStructuresToTokenList(tokens)
             storage.updateContractTokens(contractAddress, tokens)
         }
         catch (e) {
@@ -243,9 +285,9 @@ class EVM {
             modifier: [effect.identity]
         })
 
-        const {
-            bundleContract: contractAddress
-        } = Networks.getSettings(ConnectionStore.getNetwork().name)
+        const whiteList = await this.getWhiteList()
+        const bundles = await this._filterWhiteList(whiteList, CollectionType.BUNDLE)
+        const contractAddress = (bundles[0] && bundles[0].address)? bundles[0].address : '0x00'
 
         return {
             resultTokenCID: metaCID,

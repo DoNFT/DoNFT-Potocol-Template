@@ -4,6 +4,9 @@ import {catToFixed, stringCompare} from "@/utils/string";
 import ModalController from "@/components/helpers/ModalController";
 import {Networks} from "@/crypto/helpers";
 import {log} from "@/utils/AppLogger";
+import {getAvailableNetworks} from "@/crypto/helpers/Networks";
+
+const availableNetworks = getAvailableNetworks()
 
 export const useStore = defineStore('main', {
     state: () => ({
@@ -28,9 +31,10 @@ export const useStore = defineStore('main', {
             loading: false
         },
 
-        networks: [
-            {id: 1, name: 'Ethereum', key: 'ether', color: '#627EEA', available: true}
-        ],
+        networks: availableNetworks,
+        // networks: [
+        //     {id: 1, name: 'Ethereum', key: 'ether', color: '#627EEA', available: true}
+        // ],
         wallets: [
             {id: 1, name: 'MetaMask', key: 'Metamask', color: '#FFFFFF', available: true},
             {id: 3, name: 'WalletConnect', key: 'walletconnect', color: '#D9ECFF', available: true},
@@ -76,7 +80,7 @@ export const useStore = defineStore('main', {
                     cid: 'bafybeigdiwy2iay2nnmxemzdfnvbbedmiwzg5pppnl2jcptbv4c3c4yxbe/file'
                 }
             ],
-            [CollectionType.NONE]: [
+            [CollectionType.TOKENS]: [
                 {
                     isForBuy: true,
                     image: '/img/test-tokens/mountains_1.jpeg',

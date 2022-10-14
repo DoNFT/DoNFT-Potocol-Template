@@ -53,9 +53,9 @@
         else{
             store.openPreview(token)
             try{
-                if(CollectionType.isBundle(contract.type)) {
-                    await AppConnector.connector.getWrappedTokensObjectList(token.contractAddress, token.id)
-                }
+                // if(CollectionType.isBundle(contract.type)) {
+                //     await AppConnector.connector.getWrappedTokensObjectList(token.contractAddress, token.id)
+                // }
             }
             catch (e) {
                 log(e);

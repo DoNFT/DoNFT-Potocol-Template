@@ -2,8 +2,8 @@
   "name": "donft_template",
   "version": "0.1.0",
   "scripts": {
-    "serve": "export NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve",
-    "build": "export NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
   },
   "dependencies": {
     "@ledgerhq/hw-app-eth": "^6.29.0",

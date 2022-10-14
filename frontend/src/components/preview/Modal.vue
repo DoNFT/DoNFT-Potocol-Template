@@ -36,7 +36,7 @@
           class="preview__inside"
           v-if="CollectionType.isBundle(preview.contract.type)"
         >
-          <div v-for="token in preview.token.inner">
+          <div v-for="token in preview.token.structure">
             <div :style="computeTokenImgStyle(token.image)"></div>
             <div v-text="token.name"></div>
             <span
@@ -209,5 +209,6 @@
 
   const close = () => {
       store.closePreview()
+      section.value = 'info'
   }
 </script>

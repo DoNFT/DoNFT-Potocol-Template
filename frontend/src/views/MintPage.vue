@@ -84,22 +84,12 @@
     const contractAddress = ref('')
     const contractOptions = ref([])
 
-    onMounted(() => {
-        const {
-            testContract,
-            effectsContract
-        } = Networks.getSettings(ConnectionStore.getNetwork().name)
-        contractAddress.value = testContract
-        contractOptions.value = [
-            {
-                name: 'Test collection',
-                address: testContract
-            },
-            {
-                name: 'Effect collection',
-                address: effectsContract
-            }
-        ]
+    onMounted(async () => {
+        const availableContracts = await AppConnector.connector.getAvailableContractsForCustomMint()
+        if(availableContracts.length) {
+            contractAddress.value = availableContracts[0].address
+            contractOptions.value = availableContracts
+        }
     })
 
     const TokenMediaLoaderComponent = ref(null)
