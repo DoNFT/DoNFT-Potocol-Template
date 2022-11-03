@@ -65,19 +65,23 @@ export const useStore = defineStore('main', {
                     isForBuy: true,
                     image: '/img/test-tokens/mountains_1.jpeg',
                     name: 'Mountains 1',
-                    cid: 'bafybeihoistczqwg3xyzebwjp2vtjtem3qryuukr5skwng2fcrhumvkdea/file'
+                    // cid: 'bafybeihoistczqwg3xyzebwjp2vtjtem3qryuukr5skwng2fcrhumvkdea/file',
+                    ipfs: 'https://ipfs.io/ipfs/bafybeihoistczqwg3xyzebwjp2vtjtem3qryuukr5skwng2fcrhumvkdea/file',
+                    swarm: 'https://api.gateway.ethswarm.org/bzz/8d2a5af0e94b3f8448ed282636c7b698305a6aee2b8f67027760bc5a47bacf3a/'
                 },
                 {
                     isForBuy: true,
                     image: '/img/test-tokens/mountains_2.jpeg',
                     name: 'Mountains 2',
-                    cid: 'bafybeie4cexpij2k6px4cprqektt6alkdvv2p7w4ujdnocmxs67dv75rpe/file'
+                    ipfs: 'https://ipfs.io/ipfs/bafybeie4cexpij2k6px4cprqektt6alkdvv2p7w4ujdnocmxs67dv75rpe/file',
+                    swarm: 'https://api.gateway.ethswarm.org/bzz/0fd65f0c42ce8a25cbb396fc071853a8c1f52c67b82fd3bb1fe5f9bb751660d7/'
                 },
                 {
                     isForBuy: true,
                     image: '/img/test-tokens/mountains_3.jpeg',
                     name: 'Mountains 3',
-                    cid: 'bafybeigdiwy2iay2nnmxemzdfnvbbedmiwzg5pppnl2jcptbv4c3c4yxbe/file'
+                    ipfs: 'https://ipfs.io/ipfs/bafybeigdiwy2iay2nnmxemzdfnvbbedmiwzg5pppnl2jcptbv4c3c4yxbe/file',
+                    swarm: 'https://api.gateway.ethswarm.org/bzz/735899908ba009c1dba89aaa0b631a8ea99afc7802a8237e47f17b614d36d5a4/'
                 }
             ],
             [CollectionType.TOKENS]: [
@@ -85,19 +89,22 @@ export const useStore = defineStore('main', {
                     isForBuy: true,
                     image: '/img/test-tokens/mountains_1.jpeg',
                     name: 'Mountains 1',
-                    cid: 'bafybeihoistczqwg3xyzebwjp2vtjtem3qryuukr5skwng2fcrhumvkdea/file'
+                    ipfs: 'https://ipfs.io/ipfs/bafybeihoistczqwg3xyzebwjp2vtjtem3qryuukr5skwng2fcrhumvkdea/file',
+                    swarm: 'https://api.gateway.ethswarm.org/bzz/8d2a5af0e94b3f8448ed282636c7b698305a6aee2b8f67027760bc5a47bacf3a/'
                 },
                 {
                     isForBuy: true,
                     image: '/img/test-tokens/mountains_2.jpeg',
                     name: 'Mountains 2',
-                    cid: 'bafybeie4cexpij2k6px4cprqektt6alkdvv2p7w4ujdnocmxs67dv75rpe/file'
+                    ipfs: 'https://ipfs.io/ipfs/bafybeie4cexpij2k6px4cprqektt6alkdvv2p7w4ujdnocmxs67dv75rpe/file',
+                    swarm: 'https://api.gateway.ethswarm.org/bzz/0fd65f0c42ce8a25cbb396fc071853a8c1f52c67b82fd3bb1fe5f9bb751660d7/'
                 },
                 {
                     isForBuy: true,
                     image: '/img/test-tokens/mountains_3.jpeg',
                     name: 'Mountains 3',
-                    cid: 'bafybeigdiwy2iay2nnmxemzdfnvbbedmiwzg5pppnl2jcptbv4c3c4yxbe/file'
+                    ipfs: 'https://ipfs.io/ipfs/bafybeigdiwy2iay2nnmxemzdfnvbbedmiwzg5pppnl2jcptbv4c3c4yxbe/file',
+                    swarm: 'https://api.gateway.ethswarm.org/bzz/735899908ba009c1dba89aaa0b631a8ea99afc7802a8237e47f17b614d36d5a4/'
                 }
             ]
         },

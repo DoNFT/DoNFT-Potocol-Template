@@ -6,6 +6,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@ethersphere/bee-js": "^6.0.0-pre.0",
     "@ledgerhq/hw-app-eth": "^6.29.0",
     "@ledgerhq/hw-transport-webhid": "^6.27.1",
     "@rarible/connector": "^0.9.11-beta.2",
@@ -21,12 +22,20 @@
     "vue-router": "^4.0.0-0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.15",
-    "@vue/cli-plugin-router": "~4.5.15",
-    "@vue/cli-service": "~4.5.15",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-router": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
     "@vue/compiler-sfc": "^3.0.0",
+    "assert": "^2.0.0",
+    "crypto-browserify": "^3.12.0",
+    "https-browserify": "^1.0.0",
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
     "sass": "^1.26.5",
-    "sass-loader": "^8.0.2"
+    "sass-loader": "^8.0.2",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "url": "^0.11.0"
   },
   "browserslist": [
     "> 1%",

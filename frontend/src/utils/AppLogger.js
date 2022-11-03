@@ -6,6 +6,6 @@ export function log(){
         arguments
     })
     if(process.env.NODE_ENV === 'development' || localStorage.getItem('devMode')){
-        console.log(...arguments);
+        // console.log(...arguments);
     }
 }

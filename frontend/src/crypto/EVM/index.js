@@ -219,9 +219,10 @@ class EVM {
 
 
 
-    async mintTestToken({cid, contractAddress}){
+    async mintTestToken(token){
+        const cid = token[DecentralizedStorage.provider]
         const contract = new SmartContract({
-            address: contractAddress
+            address: token.contractAddress
         })
         return await contract.mint(ConnectionStore.getUserIdentity(), cid)
     }
