@@ -227,6 +227,13 @@ class EVM {
         return await contract.mint(ConnectionStore.getUserIdentity(), cid)
     }
 
+    async getContractTypeAddress(type = CollectionType.BUNDLE) {
+        const whiteList = await this.getWhiteList()
+        const contract = await this.getFromWhiteList(whiteList, type)
+        if(contract.length && contract[0].contractAddress) return contract[0].contractAddress
+        throw Error('ContractAddressNotFound')
+    }
+
     async createBundle(meta, image, tokens){
         const storage = AppStorage.getStore()
 
@@ -238,12 +245,10 @@ class EVM {
         const tokensList = Token.transformIdentitiesToObjects(tokens.map(t => t.identity))
         Token.addRole(tokensList)
 
-        const {
-            bundleContract: address
-        } = Networks.getSettings(ConnectionStore.getNetwork().name)
+        const contractAddress = this.getContractTypeAddress(CollectionType.BUNDLE)
 
         return {
-            address,
+            address: contractAddress,
             metaCID,
             tokensList
         }

@@ -87,6 +87,9 @@
     }
 
     onMounted(async () => {
+        const nftPrefix = Date.now().toString().slice(0, -3)
+        meta.name = `Bundle NFT ${nftPrefix}`
+
         const savedTokenIdentities = await store.restoreSavedTokensForBundle()
         if(savedTokenIdentities){
             try{

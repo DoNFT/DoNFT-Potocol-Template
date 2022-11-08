@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-    import {ref} from "vue";
+    import {onMounted, ref} from "vue";
     import {computeTokenImgStyle} from "@/utils/styles";
     import {checkFile} from "@/utils/file";
     import alert from "@/utils/alert";
@@ -28,33 +28,52 @@
     const image = ref(null)
     const file = ref(null)
 
+    onMounted(() => {
+        fetch(process.env.VUE_APP_NFT_SAMPLE)
+            .then(response => response.blob())
+            .then(blob => {
+                const file = new File([blob], 'nft_sample', {type: blob.type})
+                processInput({
+                    target: {
+                        files: [file]
+                    },
+                    preventDefault: () => {}
+                })
+            })
+            .catch(e => {
+                console.warn('Error load nft sample', e)
+            })
+    })
+
+    const processInput = (e) => {
+        e.preventDefault()
+        const fileForLoad = e.target.files[0]
+        if(!fileForLoad) return
+
+        try{
+            isLoading.value = true
+            checkFile(fileForLoad)
+            file.value = fileForLoad
+            image.value = URL.createObjectURL(fileForLoad)
+        }
+        catch (e){
+            let message = ''
+            if(e.message === 'TYPE') message = 'This file type is not supported'
+            else if(e.message === 'SIZE') message = 'The file is to large'
+            else message = 'Unnamed error'
+            alert.open(message)
+        }
+        finally {
+            isLoading.value = false
+        }
+    }
+
     const loadFile = () => {
         const input = document.createElement('input')
         input.setAttribute('type', 'file');
         input.setAttribute('accept', 'image/png,image/jpeg');
         document.getElementById('tempInjectedElements').appendChild(input);
-        input.onchange = (e) => {
-            e.preventDefault()
-            const fileForLoad = e.target.files[0]
-            if(!fileForLoad) return
-
-            try{
-                isLoading.value = true
-                checkFile(fileForLoad)
-                file.value = fileForLoad
-                image.value = URL.createObjectURL(fileForLoad)
-            }
-            catch (e){
-                let message = ''
-                if(e.message === 'TYPE') message = 'This file type is not supported'
-                else if(e.message === 'SIZE') message = 'The file is to large'
-                else message = 'Unnamed error'
-                alert.open(message)
-            }
-            finally {
-                isLoading.value = false
-            }
-        }
+        input.onchange = processInput
         input.click()
     }
 
