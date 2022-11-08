@@ -78,7 +78,16 @@
             })
     }
 
+    const bundleMeta = reactive({
+        name: '',
+        link: '',
+        description: '',
+    })
+
     onMounted(async () => {
+        const nftPrefix = Date.now().toString().slice(0, -3)
+        bundleMeta.name = `NFT with style ${nftPrefix}`
+
         if(!apply.value.origin.token || !apply.value.style.token){
             const isRestoreSuccess = store.restoreApplyIdentities()
             if(isRestoreSuccess){
@@ -96,12 +105,6 @@
             }
             else return initError('Restore token identities error.')
         }
-    })
-
-    const bundleMeta = reactive({
-        name: '',
-        link: '',
-        description: '',
     })
 
     const isSubmitAvailable = computed(() => {

@@ -26,7 +26,22 @@ const networks = {
         contracts: {
             whiteListContract: '0x2fa0b7dd476ba4d972ab1a103a5b48acec0e8af3',
         }
-    }
+    },
+    harmony_testnet: {
+        meta: {
+            title: 'Harmony testnet',
+            image: 'harmony',
+            chainId: 1666700000,
+            transactionExplorer: "https://explorer.pops.one/tx/",
+            accountExplorer: "https://explorer.pops.one/address/",
+            marketplaceExplorer: (contractAddress, tokenID) => `javascript:alert(${contractAddress}:${tokenID})`,
+            gasLimit: 400000,
+            gasPrice: 100000000000
+        },
+        contracts: {
+            whiteListContract: '0x9e8054972965352582c56f0364dB9105deE4057B',
+        }
+    },
 }
 Object.freeze(networks)
 
