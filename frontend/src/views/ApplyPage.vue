@@ -9,6 +9,7 @@
           </div>
         </div>
         <div class="token-page__data">
+          <SelectStorage/>
           <div class="token-page__field">
             <div>Name*</div>
             <div>
@@ -63,6 +64,7 @@
     const router = useRouter()
     import TrnView from "@/utils/TrnView";
     import {getErrorTextByCode} from "@/crypto/helpers";
+    import SelectStorage from '@/components/UI/SelectStorage'
 
     const store = useStore()
     const {

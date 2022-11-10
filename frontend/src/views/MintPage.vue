@@ -8,6 +8,7 @@
         </div>
       </div>
       <div class="token-page__data">
+        <SelectStorage/>
         <div class="token-page__field">
           <div>Collection</div>
           <div>
@@ -67,7 +68,8 @@
     import {useRouter} from "vue-router";
     const router = useRouter()
     import TrnView from "@/utils/TrnView";
-    import {ConnectionStore, getErrorTextByCode, Networks} from "@/crypto/helpers";
+    import {getErrorTextByCode} from "@/crypto/helpers";
+    import SelectStorage from '@/components/UI/SelectStorage'
 
     const store = useStore()
     const {

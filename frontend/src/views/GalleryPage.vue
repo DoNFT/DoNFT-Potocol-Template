@@ -3,8 +3,6 @@
     <LoaderElement class="collections" v-if="isCollectionsLoading">Loading...</LoaderElement>
     <template v-else>
 
-      <SelectStorage/>
-
       <ContractElement
         v-for="collection in collections"
         :contract="collection"
@@ -30,7 +28,6 @@
     import PreviewToken from '@/components/preview/Modal'
     import ContractElement from '@/components/gallery/Contract'
     import LoaderElement from '@/components/UI/Loader'
-    import SelectStorage from '@/components/UI/SelectStorage'
 
     import {useStore} from "@/store/main";
     // import AppConnector from "@/crypto/AppConnector";

@@ -1,7 +1,7 @@
 <template>
   <div class="contract">
     <div class="contract__name" v-text="contract.name"></div>
-    <div class="contract__tokens" :class="{loading: contract.isUpdating}" v-if="tokensView.length">
+    <div class="contract__tokens" :class="{loading: contract.isUpdating}" v-if="(!contract.isUpdating && tokensView.length) || contract.isUpdating">
       <LoaderElement class="contract" v-if="contract.isUpdating">Loading...</LoaderElement>
       <template v-else>
         <TokenElement

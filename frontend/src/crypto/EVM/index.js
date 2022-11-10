@@ -204,7 +204,7 @@ class EVM {
         const storage = AppStorage.getStore()
         try{
             storage.changeContractUpdating(contractAddress, true)
-            let tokens = await this.getContractTokens(contractAddress, true)
+            let tokens = await this.getContractTokens(contractAddress)
             tokens = await this.addStructuresToTokenList(tokens)
             storage.updateContractTokens(contractAddress, tokens)
         }
